@@ -1,0 +1,24 @@
+# Environment
+.env
+
+# Database
+*.db
+md.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.venv/
+*.egg-info/
+
+# Node
+node_modules/
+dist/
+build/
+.vite/
+
+# OS
+.DS_Store
