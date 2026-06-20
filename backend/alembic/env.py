@@ -12,6 +12,7 @@ load_dotenv()
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app.db.database import Base
+import app.models  # noqa: F401 — registers all models on Base.metadata
 
 config = context.config
 
