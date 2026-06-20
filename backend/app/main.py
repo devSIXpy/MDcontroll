@@ -2,14 +2,14 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from app.api.finances import router as finances_router
 
 load_dotenv()
 
 app = FastAPI(title="MD API")
 
-origins = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
-
+origins = [o.strip() for o in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
