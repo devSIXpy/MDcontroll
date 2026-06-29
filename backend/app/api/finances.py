@@ -1,3 +1,4 @@
+import datetime as dt
 from datetime import date
 from typing import Optional
 from fastapi import APIRouter, Depends
@@ -7,6 +8,8 @@ from app.db.database import get_db
 from app.schemas.finance import (
     CategoryCreate,
     CategoryRead,
+    FinanceSummary,
+    MonthlyBalanceItem,
     TransactionCreate,
     TransactionRead,
     TransactionUpdate,
@@ -54,3 +57,17 @@ def list_categories(type: Optional[str] = None, db: Session = Depends(get_db)):
 @router.post("/categories", response_model=CategoryRead, status_code=201)
 def create_category(data: CategoryCreate, db: Session = Depends(get_db)):
     return finance_service.create_category(db, data)
+
+
+@router.get("/summary/monthly", response_model=list[MonthlyBalanceItem])
+def monthly_balance(year: Optional[int] = None, db: Session = Depends(get_db)):
+    return finance_service.get_monthly_balance(db, year or dt.date.today().year)
+
+
+@router.get("/summary", response_model=FinanceSummary)
+def summary(
+    start_date: Optional[date] = None,
+    end_date: Optional[date] = None,
+    db: Session = Depends(get_db),
+):
+    return finance_service.get_summary(db, start_date, end_date)

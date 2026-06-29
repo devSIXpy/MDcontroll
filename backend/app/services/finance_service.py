@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Optional
 from fastapi import HTTPException
-from sqlalchemy import select, desc
+from sqlalchemy import func, select, desc
 from sqlalchemy.orm import Session, joinedload
 
 from app.models.finance import Category, Transaction
@@ -105,3 +105,67 @@ def delete_transaction(db: Session, id: int) -> None:
     transaction = _load_transaction(db, id)
     db.delete(transaction)
     db.commit()
+
+
+def get_monthly_balance(db: Session, year: int) -> list[dict]:
+    rows = db.execute(
+        select(
+            func.strftime("%m", Transaction.date).label("month"),
+            Transaction.type,
+            func.sum(Transaction.amount).label("total"),
+        )
+        .where(func.strftime("%Y", Transaction.date) == str(year))
+        .group_by(func.strftime("%m", Transaction.date), Transaction.type)
+    ).all()
+
+    data: dict[int, dict[str, float]] = {}
+    for row in rows:
+        m = int(row.month)
+        if m not in data:
+            data[m] = {"income": 0.0, "expense": 0.0}
+        data[m][row.type] = float(row.total)
+
+    return [
+        {
+            "month": m,
+            "income": data.get(m, {}).get("income", 0.0),
+            "expense": data.get(m, {}).get("expense", 0.0),
+            "balance": data.get(m, {}).get("income", 0.0) - data.get(m, {}).get("expense", 0.0),
+        }
+        for m in range(1, 13)
+    ]
+
+
+def get_summary(
+    db: Session,
+    start_date: Optional[date] = None,
+    end_date: Optional[date] = None,
+) -> dict:
+    stmt = select(
+        Transaction.type,
+        func.sum(Transaction.amount).label("total"),
+        func.count(Transaction.id).label("cnt"),
+    ).group_by(Transaction.type)
+
+    if start_date:
+        stmt = stmt.where(Transaction.date >= start_date)
+    if end_date:
+        stmt = stmt.where(Transaction.date <= end_date)
+
+    rows = db.execute(stmt).all()
+    income = 0.0
+    expense = 0.0
+    transaction_count = 0
+    for row in rows:
+        if row.type == "income":
+            income = float(row.total or 0)
+        elif row.type == "expense":
+            expense = float(row.total or 0)
+        transaction_count += row.cnt
+
+    return {
+        "total_income": income,
+        "total_expense": expense,
+        "balance": income - expense,
+        "transaction_count": transaction_count,
+    }

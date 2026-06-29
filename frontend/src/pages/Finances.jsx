@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import TransactionFilters from '../components/finances/TransactionFilters'
 import TransactionForm from '../components/finances/TransactionForm'
 import TransactionList from '../components/finances/TransactionList'
+import MonthlyBalanceChart from '../components/finances/MonthlyBalanceChart'
 import Button from '../components/ui/Button'
 import { getTransactions, getCategories, deleteTransaction } from '../services/api'
 import { formatCurrency } from '../utils/format'
@@ -92,11 +93,13 @@ export default function Finances() {
           </Button>
         </div>
 
+        <MonthlyBalanceChart />
+
         <div className="grid grid-cols-3 gap-3">
-          <SummaryCard label="Receitas" value={income} color="text-success" />
-          <SummaryCard label="Despesas" value={expense} color="text-danger" />
+          <SummaryCard label="Receitas (filtro)" value={income} color="text-success" />
+          <SummaryCard label="Despesas (filtro)" value={expense} color="text-danger" />
           <SummaryCard
-            label="Saldo"
+            label="Saldo (filtro)"
             value={balance}
             color={balance >= 0 ? 'text-success' : 'text-danger'}
           />

@@ -4,6 +4,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.finances import router as finances_router
+from app.api.tasks import router as tasks_router
+from app.api.ideas import router as ideas_router
+from app.api.dashboard import router as dashboard_router
 
 load_dotenv()
 
@@ -25,3 +28,6 @@ def health_check():
 
 
 app.include_router(finances_router)
+app.include_router(tasks_router)
+app.include_router(ideas_router)
+app.include_router(dashboard_router)

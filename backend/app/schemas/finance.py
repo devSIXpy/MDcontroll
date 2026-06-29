@@ -60,3 +60,17 @@ class TransactionRead(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class MonthlyBalanceItem(BaseModel):
+    month: int
+    income: float
+    expense: float
+    balance: float
+
+
+class FinanceSummary(BaseModel):
+    total_income: float
+    total_expense: float
+    balance: float
+    transaction_count: int

@@ -1,0 +1,13 @@
+[Unit]
+Description=MD Backend
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/six/MDcontroll/backend
+ExecStart=/home/six/MDcontroll/backend/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
